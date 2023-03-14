@@ -1,43 +1,33 @@
 import './App.css';
 import DiaryEditor from './DiaryEditor';
 import DiaryList from './DiaryList';
-
-const dummyList = [
-  {
-    id: 1,
-    author: "최문준",
-    content: "하이!",
-    emotion: 5,
-    created_date: new Date().getTime()
-  },
-  {
-    id: 2,
-    author: "이정환",
-    content: "하이!",
-    emotion: 4,
-    created_date: new Date().getTime()
-  },
-  {
-    id: 3,
-    author: "이수만",
-    content: "하이!",
-    emotion: 3,
-    created_date: new Date().getTime()
-  }
-  ,{
-    id: 4,
-    author: "김동훈",
-    content: "하이!",
-    emotion: 2,
-    created_date: new Date().getTime()
-  }
-];
+import React, { useRef, useState } from "react";
 
 function App() {
+  const [data, setData] = useState([]);
+
+  const dataId = useRef(0);
+
+  const onCreate = (author, content, emotion) => {
+    const created_date = new Date().getTime();
+    const newItem = {
+      author,
+      content,
+      emotion,
+      created_date,
+      id : dataId.current
+    }
+    dataId.current += 1;
+    // 새로 추가하면 맨위에 보여줄거라서 맨 밑에서 보여줄거면 setData([...data, newItem]);
+    setData([newItem, ...data]); 
+
+
+  };
+
   return (
     <div className='App'>
-      <DiaryEditor></DiaryEditor>
-      <DiaryList diaryList={dummyList}></DiaryList>
+      <DiaryEditor onCreate={onCreate}></DiaryEditor>
+      <DiaryList diaryList={data}></DiaryList>
     </div>
   );
 }
