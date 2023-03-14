@@ -4,6 +4,7 @@ import DiaryList from './DiaryList';
 import React, { useRef, useState } from "react";
 
 function App() {
+  // DiaryEditor, DiaryList가 함께 쓸 일기 data가 있다. 빈 배열로 시작
   const [data, setData] = useState([]);
 
   const dataId = useRef(0);
@@ -20,14 +21,18 @@ function App() {
     dataId.current += 1;
     // 새로 추가하면 맨위에 보여줄거라서 맨 밑에서 보여줄거면 setData([...data, newItem]);
     setData([newItem, ...data]); 
-
-
   };
+
+  const onDelete = (targetId) => {
+    console.log(`${targetId} 삭제되었습니다.`)
+    const newDiaryList = data.filter((it) => it.id !== targetId);
+    setData(newDiaryList);
+  }
 
   return (
     <div className='App'>
       <DiaryEditor onCreate={onCreate}></DiaryEditor>
-      <DiaryList diaryList={data}></DiaryList>
+      <DiaryList onDelete={onDelete} diaryList={data}></DiaryList>
     </div>
   );
 }
