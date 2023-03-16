@@ -1,6 +1,10 @@
-import React, { useRef, useState } from "react";
+import React, {useEffect, useRef, useState } from "react";
 
 const DiaryEditor = ({onCreate}) => {
+
+    useEffect(() => {
+        console.log("다이어리에디터 렌더!");
+    });
     
     const authorInput = useRef();
     const contentInput = useRef();
@@ -20,7 +24,6 @@ const DiaryEditor = ({onCreate}) => {
     // 체크 기능 추가
     // 요즘은 alert을 띄우는게 아니라 포커스를 둔다
     const handleSubmit = () => {
-        console.log(state);
         if(state.author.length < 1) {
             // alert("작성자는 1글자 이상 입력해주세요!");
             // focus
@@ -80,4 +83,4 @@ const DiaryEditor = ({onCreate}) => {
     </div>;
 };
 
-export default DiaryEditor;
+export default React.memo(DiaryEditor);
