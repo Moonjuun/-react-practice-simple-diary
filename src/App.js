@@ -25,7 +25,11 @@ const reducer = (state, action) => {
     default :
     return state;
   }
-}
+};
+
+// default 안쓰는 이유? 기본적으로는 App.js를 내보내고 있고 부가적으로 DiaryStateContext를 내보내고 있다!
+export const DiaryStateContext = React.createContext();
+export const DiaryDispatchContext = React.createContext();
 
 function App() {
   // DiaryEditor, DiaryList가 함께 쓸 일기 data가 있다. 빈 배열로 시작
@@ -73,6 +77,11 @@ function App() {
     dispatch({type:'EDIT', targetId, newContent})
   },[]);
 
+  // useMemo를 활용해서 재성성이 되지 않게 묶어줘야 한다!
+  const memoizedDispatches = useMemo(() => {
+    return {onCreate, onRemove, onEdit}
+  }, []);
+
   // 함수 연산을 최적화 해주는 useMemo
   const getDiaryAnalysis = useMemo(() => {
 
@@ -86,14 +95,18 @@ function App() {
   const {goodCount, badCount, goodRatio} = getDiaryAnalysis;
 
   return (
-    <div className='App'>
-      <DiaryEditor onCreate={onCreate}></DiaryEditor>
-      <div>전체 일기 : {data.length}</div>
-      <div>기분 좋은 일기 개수 : {goodCount}</div>
-      <div>기분 나쁜 일기 개수 : {badCount}</div>
-      <div>기분 좋은 일기 비율 : {goodRatio}</div>
-      <DiaryList onEdit={onEdit} onRemove={onRemove} diaryList={data}></DiaryList>
-    </div>
+    <DiaryStateContext.Provider value = {data}> 
+      <DiaryDispatchContext.Provider value = {memoizedDispatches}>
+        <div className='App'>
+          <DiaryEditor></DiaryEditor>
+          <div>전체 일기 : {data.length}</div>
+          <div>기분 좋은 일기 개수 : {goodCount}</div>
+          <div>기분 나쁜 일기 개수 : {badCount}</div>
+          <div>기분 좋은 일기 비율 : {goodRatio}</div>
+          <DiaryList></DiaryList>
+        </div>
+      </DiaryDispatchContext.Provider>
+    </DiaryStateContext.Provider>
   );
 }
 

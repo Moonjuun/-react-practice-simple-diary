@@ -1,6 +1,10 @@
-import React, {useEffect, useRef, useState } from "react";
+import React, {useContext, useEffect, useRef, useState } from "react";
+import { DiaryDispatchContext } from "./App";
 
-const DiaryEditor = ({onCreate}) => {
+const DiaryEditor = () => {
+
+    // onCreate는 3개로 이루어진 객체기 때문에 비구조할당으로 가져와야 한다
+    const {onCreate} = useContext(DiaryDispatchContext);
 
     useEffect(() => {
         console.log("다이어리에디터 렌더!");
