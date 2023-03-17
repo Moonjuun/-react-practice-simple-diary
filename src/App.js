@@ -1,11 +1,37 @@
 import './App.css';
 import DiaryEditor from './DiaryEditor';
 import DiaryList from './DiaryList';
-import React, { useMemo, useEffect, useRef, useState, useCallback } from "react";
+import React, { useMemo, useEffect, useRef, useReducer, useCallback } from "react";
+
+const reducer = (state, action) => {
+  switch(action.type) {
+    case 'INIT': {
+      return action.data;
+    }
+    case 'CREATE': {
+      const created_date = new Date().getTime();
+      const newItem = {
+        ...action.data,
+        created_date
+      }
+      return [newItem, ...state];
+    }
+    case 'REMOVE': {
+      return state.filter((it) => it.id !== action.targetId);
+    }
+    case 'EDIT': {
+      return state.map((it) => it.id === action.targetId ? {...it, content:action.newContent} : it)
+    }
+    default :
+    return state;
+  }
+}
 
 function App() {
   // DiaryEditor, DiaryList가 함께 쓸 일기 data가 있다. 빈 배열로 시작
-  const [data, setData] = useState([]);
+  // const [data, setData] = useState([]);
+
+  const [data, dispatch] = useReducer(reducer, []);
 
   const dataId = useRef(0);
 
@@ -21,7 +47,8 @@ function App() {
         id : dataId.current++
       }
     })
-    setData(initData);
+
+    dispatch({type:"INIT", data: initData})
   };
 
   // 마운트 되는 시점에 함수를 호출!
@@ -30,28 +57,20 @@ function App() {
   }, [])
 
   const onCreate = useCallback((author, content, emotion) => {
-    const created_date = new Date().getTime();
-    const newItem = {
-      author,
-      content,
-      emotion,
-      created_date,
-      id : dataId.current
-    }
+    
+    dispatch({type:'CREATE', data:{author, content, emotion, id:dataId.current}})
+    
     dataId.current += 1;
     // 새로 추가하면 맨위에 보여줄거라서 맨 밑에서 보여줄거면 setData([...data, newItem]);
-    setData((data)=>[newItem, ...data]); 
   }, []);
 
   const onRemove = useCallback((targetId) => {
-    setData(data => data.filter((it) => it.id !== targetId));
+
+    dispatch({type:'REMOVE', targetId})
   }, []);
 
   const onEdit = useCallback((targetId, newContent) => {
-    setData(
-      data => 
-      data.map((it) => it.id === targetId ? {...it, content: newContent } : it)
-    )
+    dispatch({type:'EDIT', targetId, newContent})
   },[]);
 
   // 함수 연산을 최적화 해주는 useMemo
